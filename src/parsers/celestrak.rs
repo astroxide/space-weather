@@ -83,9 +83,9 @@ fn resolve_array_cols(
     count: usize,
 ) -> Result<[usize; 8], SpaceWeatherError> {
     let mut indices = [0usize; 8];
-    for i in 0..count {
+    for (i, slot) in indices.iter_mut().enumerate().take(count) {
         let name = alloc::format!("{}{}", prefix, i + 1);
-        indices[i] = require_col(cols, &name)?;
+        *slot = require_col(cols, &name)?;
     }
     Ok(indices)
 }
@@ -267,7 +267,7 @@ mod tests {
     #[test]
     fn parse_ap_3hr_missing_one_gives_none() {
         let row = "2023-06-15,2514,25,2.0,3.3,1.7,2.3,4.0,5.0,2.7,1.0,22.0,7,12,5,9,27,39,12,,14,0.8,3,135,150.3,148.1,0,150.2,148.9,147.1,146.0";
-        let csv = make_csv(&[&row]);
+        let csv = make_csv(&[row]);
         let records = parse(csv.as_bytes()).unwrap();
         assert_eq!(records[0].ap_3hr, None);
     }
