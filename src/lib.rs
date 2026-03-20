@@ -79,7 +79,9 @@ impl fmt::Display for SpaceWeatherError {
             Self::InvalidDate => write!(f, "invalid date"),
             Self::InvalidIndex => write!(f, "invalid index value"),
             Self::InvalidHeader => write!(f, "invalid or missing CSV header"),
-            Self::ParseError { row, message } => write!(f, "parse error at row {}: {}", row, message),
+            Self::ParseError { row, message } => {
+                write!(f, "parse error at row {}: {}", row, message)
+            }
         }
     }
 }

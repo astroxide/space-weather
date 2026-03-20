@@ -7,11 +7,22 @@ const SW_LAST5: &[u8] = include_bytes!("fixtures/SW-Last5Years.csv");
 #[test]
 fn parse_sw_all() {
     let records = celestrak::parse(SW_ALL).unwrap();
-    assert!(records.len() > 25_000, "expected >25k rows, got {}", records.len());
+    assert!(
+        records.len() > 25_000,
+        "expected >25k rows, got {}",
+        records.len()
+    );
 
     // first record: 1957-10-01
     let first = &records[0];
-    assert_eq!(first.date, Date { year: 1957, month: 10, day: 1 });
+    assert_eq!(
+        first.date,
+        Date {
+            year: 1957,
+            month: 10,
+            day: 1
+        }
+    );
     assert_eq!(first.f10_7, Some(269.3));
     assert_eq!(first.ap_daily, Some(21.0));
     assert!(first.ap_3hr.is_some());
@@ -21,10 +32,21 @@ fn parse_sw_all() {
 #[test]
 fn parse_sw_last5years() {
     let records = celestrak::parse(SW_LAST5).unwrap();
-    assert!(records.len() > 1_000, "expected >1k rows, got {}", records.len());
+    assert!(
+        records.len() > 1_000,
+        "expected >1k rows, got {}",
+        records.len()
+    );
 
     let first = &records[0];
-    assert_eq!(first.date, Date { year: 2021, month: 1, day: 1 });
+    assert_eq!(
+        first.date,
+        Date {
+            year: 2021,
+            month: 1,
+            day: 1
+        }
+    );
     assert_eq!(first.f10_7, Some(80.4));
     assert_eq!(first.f10_7a, Some(77.7));
 }
@@ -33,10 +55,7 @@ fn parse_sw_last5years() {
 fn predicted_monthly_rows_have_empty_kp_ap() {
     let records = celestrak::parse(SW_ALL).unwrap();
     // PRM rows start at 2026-06-01 — monthly predictions with no Kp/Ap
-    let predicted: Vec<_> = records
-        .iter()
-        .filter(|r| r.date.year >= 2027)
-        .collect();
+    let predicted: Vec<_> = records.iter().filter(|r| r.date.year >= 2027).collect();
     assert!(!predicted.is_empty());
     for r in &predicted {
         assert_eq!(r.kp_3hr, None);
@@ -50,7 +69,12 @@ fn predicted_monthly_rows_have_empty_kp_ap() {
 fn chronological_order() {
     let records = celestrak::parse(SW_ALL).unwrap();
     for pair in records.windows(2) {
-        assert!(pair[0].date <= pair[1].date, "out of order: {:?} > {:?}", pair[0].date, pair[1].date);
+        assert!(
+            pair[0].date <= pair[1].date,
+            "out of order: {:?} > {:?}",
+            pair[0].date,
+            pair[1].date
+        );
     }
 }
 

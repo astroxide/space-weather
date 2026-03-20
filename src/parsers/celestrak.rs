@@ -26,9 +26,15 @@ fn parse_date(field: &str) -> Result<Date, SpaceWeatherError> {
     if parts.len() != 3 {
         return Err(SpaceWeatherError::InvalidDate);
     }
-    let year: i32 = parts[0].parse().map_err(|_| SpaceWeatherError::InvalidDate)?;
-    let month: u8 = parts[1].parse().map_err(|_| SpaceWeatherError::InvalidDate)?;
-    let day: u8 = parts[2].parse().map_err(|_| SpaceWeatherError::InvalidDate)?;
+    let year: i32 = parts[0]
+        .parse()
+        .map_err(|_| SpaceWeatherError::InvalidDate)?;
+    let month: u8 = parts[1]
+        .parse()
+        .map_err(|_| SpaceWeatherError::InvalidDate)?;
+    let day: u8 = parts[2]
+        .parse()
+        .map_err(|_| SpaceWeatherError::InvalidDate)?;
     let date = Date { year, month, day };
     date.validate()?;
     Ok(date)
@@ -50,10 +56,7 @@ fn require_col(cols: &BTreeMap<String, usize>, name: &str) -> Result<usize, Spac
     col_index(cols, name).ok_or(SpaceWeatherError::InvalidHeader)
 }
 
-fn parse_array_8(
-    fields: &[&str],
-    indices: &[usize; 8],
-) -> Option<[f64; 8]> {
+fn parse_array_8(fields: &[&str], indices: &[usize; 8]) -> Option<[f64; 8]> {
     let mut arr = [0.0; 8];
     for (i, &idx) in indices.iter().enumerate() {
         let field = fields.get(idx).copied().unwrap_or("");
@@ -112,10 +115,7 @@ fn parse_row(
     layout: &ColumnLayout,
     row_num: usize,
 ) -> Result<SpaceWeatherRecord, SpaceWeatherError> {
-    let date_field = fields
-        .get(layout.date)
-        .copied()
-        .unwrap_or("");
+    let date_field = fields.get(layout.date).copied().unwrap_or("");
     let date = parse_date(date_field).map_err(|_| SpaceWeatherError::ParseError {
         row: row_num,
         message: String::from("invalid date"),
@@ -185,14 +185,34 @@ mod tests {
         let records = parse(csv.as_bytes()).unwrap();
         assert_eq!(records.len(), 2);
 
-        assert_eq!(records[0].date, Date { year: 2023, month: 6, day: 15 });
+        assert_eq!(
+            records[0].date,
+            Date {
+                year: 2023,
+                month: 6,
+                day: 15
+            }
+        );
         assert_eq!(records[0].f10_7, Some(150.3));
         assert_eq!(records[0].f10_7a, Some(148.1));
         assert_eq!(records[0].ap_daily, Some(14.0));
-        assert_eq!(records[0].ap_3hr, Some([7.0, 12.0, 5.0, 9.0, 27.0, 39.0, 12.0, 4.0]));
-        assert_eq!(records[0].kp_3hr, Some([2.0, 3.3, 1.7, 2.3, 4.0, 5.0, 2.7, 1.0]));
+        assert_eq!(
+            records[0].ap_3hr,
+            Some([7.0, 12.0, 5.0, 9.0, 27.0, 39.0, 12.0, 4.0])
+        );
+        assert_eq!(
+            records[0].kp_3hr,
+            Some([2.0, 3.3, 1.7, 2.3, 4.0, 5.0, 2.7, 1.0])
+        );
 
-        assert_eq!(records[1].date, Date { year: 2023, month: 6, day: 16 });
+        assert_eq!(
+            records[1].date,
+            Date {
+                year: 2023,
+                month: 6,
+                day: 16
+            }
+        );
     }
 
     #[test]
