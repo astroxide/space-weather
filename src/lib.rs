@@ -1,6 +1,9 @@
 #![no_std]
 extern crate alloc;
 
+pub mod parsers;
+
+use alloc::string::String;
 use alloc::vec::Vec;
 use core::fmt;
 
@@ -66,6 +69,8 @@ pub trait SpaceWeatherIndex {
 pub enum SpaceWeatherError {
     InvalidDate,
     InvalidIndex,
+    InvalidHeader,
+    ParseError { row: usize, message: String },
 }
 
 impl fmt::Display for SpaceWeatherError {
@@ -73,6 +78,10 @@ impl fmt::Display for SpaceWeatherError {
         match self {
             Self::InvalidDate => write!(f, "invalid date"),
             Self::InvalidIndex => write!(f, "invalid index value"),
+            Self::InvalidHeader => write!(f, "invalid or missing CSV header"),
+            Self::ParseError { row, message } => {
+                write!(f, "parse error at row {}: {}", row, message)
+            }
         }
     }
 }
