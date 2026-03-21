@@ -9,18 +9,28 @@ fn skip_line(line: &str) -> bool {
     trimmed.is_empty() || trimmed.starts_with('#')
 }
 
-fn parse_int<T: str::FromStr>(slice: &str, row: usize, field: &str) -> Result<T, SpaceWeatherError> {
-    slice.trim().parse().map_err(|_| SpaceWeatherError::ParseError {
-        row,
-        message: String::from(field),
-    })
+fn parse_int<T: str::FromStr>(
+    slice: &str,
+    row: usize,
+    field: &str,
+) -> Result<T, SpaceWeatherError> {
+    slice
+        .trim()
+        .parse()
+        .map_err(|_| SpaceWeatherError::ParseError {
+            row,
+            message: String::from(field),
+        })
 }
 
 fn parse_float(slice: &str, row: usize, field: &str) -> Result<f64, SpaceWeatherError> {
-    slice.trim().parse().map_err(|_| SpaceWeatherError::ParseError {
-        row,
-        message: String::from(field),
-    })
+    slice
+        .trim()
+        .parse()
+        .map_err(|_| SpaceWeatherError::ParseError {
+            row,
+            message: String::from(field),
+        })
 }
 
 fn is_leap_year(year: i32) -> bool {
@@ -197,7 +207,14 @@ DTC 2023  167  24  38  38  38  31  31  31  38  38  38  31  31  31  31  31  31  3
         assert_eq!(records.len(), 2);
 
         // DOY 166 = June 15
-        assert_eq!(records[0].date, Date { year: 2023, month: 6, day: 15 });
+        assert_eq!(
+            records[0].date,
+            Date {
+                year: 2023,
+                month: 6,
+                day: 15
+            }
+        );
         assert_eq!(records[0].f10_7, Some(150.3));
         assert_eq!(records[0].f10_7a, Some(148.1));
         assert_eq!(records[0].s10_7, Some(120.5));
@@ -205,7 +222,14 @@ DTC 2023  167  24  38  38  38  31  31  31  38  38  38  31  31  31  31  31  31  3
         assert_eq!(records[0].y10_7, Some(118.9));
 
         // DOY 167 = June 16
-        assert_eq!(records[1].date, Date { year: 2023, month: 6, day: 16 });
+        assert_eq!(
+            records[1].date,
+            Date {
+                year: 2023,
+                month: 6,
+                day: 16
+            }
+        );
         assert_eq!(records[1].f10_7, Some(152.0));
     }
 
@@ -230,7 +254,8 @@ DTC 2023  167  24  38  38  38  31  31  31  38  38  38  31  31  31  31  31  31  3
 
     #[test]
     fn solfsmy_invalid_numeric() {
-        let input = "  2023 166   2460111.5 XXXXX 148.1 120.5 118.2 115.3 113.1 118.9 116.5  0000\n";
+        let input =
+            "  2023 166   2460111.5 XXXXX 148.1 120.5 118.2 115.3 113.1 118.9 116.5  0000\n";
         let result = parse_solfsmy(input.as_bytes());
         assert!(matches!(result, Err(SpaceWeatherError::ParseError { .. })));
     }
@@ -238,9 +263,17 @@ DTC 2023  167  24  38  38  38  31  31  31  38  38  38  31  31  31  31  31  31  3
     #[test]
     fn solfsmy_leap_year_doy() {
         // 2024 is leap year, DOY 60 = Feb 29
-        let input = "  2024  60   2460370.5 150.3 148.1 120.5 118.2 115.3 113.1 118.9 116.5  0000\n";
+        let input =
+            "  2024  60   2460370.5 150.3 148.1 120.5 118.2 115.3 113.1 118.9 116.5  0000\n";
         let records = parse_solfsmy(input.as_bytes()).unwrap();
-        assert_eq!(records[0].date, Date { year: 2024, month: 2, day: 29 });
+        assert_eq!(
+            records[0].date,
+            Date {
+                year: 2024,
+                month: 2,
+                day: 29
+            }
+        );
     }
 
     // --- DTCFILE tests ---
@@ -251,13 +284,27 @@ DTC 2023  167  24  38  38  38  31  31  31  38  38  38  31  31  31  31  31  31  3
         assert_eq!(records.len(), 2);
 
         // DOY 166 = June 15
-        assert_eq!(records[0].date, Date { year: 2023, month: 6, day: 15 });
+        assert_eq!(
+            records[0].date,
+            Date {
+                year: 2023,
+                month: 6,
+                day: 15
+            }
+        );
         // Sum: 31+50+50+50+44+44+44+50+50+50+44+44+44+24+24+24+24+24+24+31+31+31+31+31 = 894
         let expected_mean = 894.0 / 24.0;
         assert!((records[0].dtc.unwrap() - expected_mean).abs() < 1e-10);
 
         // DOY 167 = June 16
-        assert_eq!(records[1].date, Date { year: 2023, month: 6, day: 16 });
+        assert_eq!(
+            records[1].date,
+            Date {
+                year: 2023,
+                month: 6,
+                day: 16
+            }
+        );
     }
 
     #[test]

@@ -17,7 +17,11 @@ fn parse_solfsmy_all() {
     let first = &records[0];
     assert_eq!(
         first.date,
-        Date { year: 1997, month: 1, day: 1 }
+        Date {
+            year: 1997,
+            month: 1,
+            day: 1
+        }
     );
     assert_eq!(first.f10_7, Some(72.4));
     assert_eq!(first.f10_7a, Some(78.0));
@@ -39,7 +43,11 @@ fn parse_dtcfile_all() {
     let first = &records[0];
     assert_eq!(
         first.date,
-        Date { year: 1997, month: 1, day: 1 }
+        Date {
+            year: 1997,
+            month: 1,
+            day: 1
+        }
     );
     assert!(first.dtc.is_some());
 }
