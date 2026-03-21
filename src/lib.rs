@@ -1,6 +1,7 @@
 #![no_std]
 extern crate alloc;
 
+pub mod centered_average;
 pub mod parsers;
 
 use alloc::string::String;
@@ -70,6 +71,7 @@ pub enum SpaceWeatherError {
     InvalidDate,
     InvalidIndex,
     InvalidHeader,
+    InvalidWindow,
     ParseError { row: usize, message: String },
 }
 
@@ -79,6 +81,7 @@ impl fmt::Display for SpaceWeatherError {
             Self::InvalidDate => write!(f, "invalid date"),
             Self::InvalidIndex => write!(f, "invalid index value"),
             Self::InvalidHeader => write!(f, "invalid or missing CSV header"),
+            Self::InvalidWindow => write!(f, "window must be a positive odd number"),
             Self::ParseError { row, message } => {
                 write!(f, "parse error at row {}: {}", row, message)
             }
