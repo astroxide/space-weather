@@ -46,12 +46,18 @@ fn basic_averaging() {
 
 #[test]
 fn even_window_rejected() {
-    assert_eq!(centered_mean(&[Some(1.0)], 80), Err(SpaceWeatherError::InvalidWindow));
+    assert_eq!(
+        centered_mean(&[Some(1.0)], 80),
+        Err(SpaceWeatherError::InvalidWindow)
+    );
 }
 
 #[test]
 fn zero_window_rejected() {
-    assert_eq!(centered_mean(&[Some(1.0)], 0), Err(SpaceWeatherError::InvalidWindow));
+    assert_eq!(
+        centered_mean(&[Some(1.0)], 0),
+        Err(SpaceWeatherError::InvalidWindow)
+    );
 }
 
 #[test]
@@ -67,7 +73,11 @@ fn none_propagation() {
 
 fn make_record(date_day: u8, f10_7: Option<f64>, f10_7a: Option<f64>) -> SpaceWeatherRecord {
     SpaceWeatherRecord {
-        date: Date { year: 2023, month: 1, day: date_day },
+        date: Date {
+            year: 2023,
+            month: 1,
+            day: date_day,
+        },
         f10_7,
         f10_7a,
         ap_daily: None,
@@ -86,13 +96,7 @@ fn compute_for_records_populates_f10_7a() {
         .map(|d| make_record(d, Some(d as f64 * 10.0), None))
         .collect();
 
-    compute_for_records(
-        &mut records,
-        3,
-        |r| r.f10_7,
-        |r, v| r.f10_7a = v,
-    )
-    .unwrap();
+    compute_for_records(&mut records, 3, |r| r.f10_7, |r, v| r.f10_7a = v).unwrap();
 
     assert_eq!(records[0].f10_7a, None);
     assert_eq!(records[1].f10_7a, Some(20.0));
@@ -107,13 +111,7 @@ fn compute_for_records_overwrites_existing() {
         .map(|d| make_record(d, Some(d as f64), Some(999.0)))
         .collect();
 
-    compute_for_records(
-        &mut records,
-        3,
-        |r| r.f10_7,
-        |r, v| r.f10_7a = v,
-    )
-    .unwrap();
+    compute_for_records(&mut records, 3, |r| r.f10_7, |r, v| r.f10_7a = v).unwrap();
 
     // Edges overwritten to None, middle overwritten to computed value
     assert_eq!(records[0].f10_7a, None);
@@ -160,7 +158,11 @@ fn validate_against_celestrak_precomputed() {
     // Compare only on observed (non-predicted) data. CelesTrak's CENTER81
     // in the predicted region uses forecast values we don't have, so we
     // restrict to dates before 2026 where observed F10.7 is final.
-    let cutoff = Date { year: 2026, month: 1, day: 1 };
+    let cutoff = Date {
+        year: 2026,
+        month: 1,
+        day: 1,
+    };
     let mut compared = 0;
     let mut max_diff: f64 = 0.0;
     for (i, rec) in records.iter().enumerate() {
@@ -176,9 +178,17 @@ fn validate_against_celestrak_precomputed() {
             assert!(
                 diff < 0.15,
                 "day {}: computed={}, expected={}, diff={}",
-                i, computed, expected, diff
+                i,
+                computed,
+                expected,
+                diff
             );
         }
     }
-    assert!(compared > 100, "compared {} records, max_diff={:.4}", compared, max_diff);
+    assert!(
+        compared > 100,
+        "compared {} records, max_diff={:.4}",
+        compared,
+        max_diff
+    );
 }

@@ -9,7 +9,7 @@ pub fn centered_mean(
     values: &[Option<f64>],
     window: usize,
 ) -> Result<Vec<Option<f64>>, SpaceWeatherError> {
-    if window == 0 || window % 2 == 0 {
+    if window == 0 || window.is_multiple_of(2) {
         return Err(SpaceWeatherError::InvalidWindow);
     }
 
@@ -21,7 +21,8 @@ pub fn centered_mean(
     let half = window / 2;
     let mut result = vec![None; n];
 
-    for i in half..n.saturating_sub(half) {
+    for (i, slot) in result[half..n.saturating_sub(half)].iter_mut().enumerate() {
+        let i = i + half;
         if i + half >= n {
             break;
         }
@@ -39,7 +40,7 @@ pub fn centered_mean(
             }
         }
         if all_some {
-            result[i] = Some(sum / window as f64);
+            *slot = Some(sum / window as f64);
         }
     }
 
