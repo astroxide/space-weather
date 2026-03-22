@@ -1,7 +1,9 @@
-#![no_std]
+#![cfg_attr(not(feature = "std"), no_std)]
 extern crate alloc;
 
 pub mod centered_average;
+#[cfg(feature = "fetch")]
+pub mod fetch;
 pub mod parsers;
 pub mod store;
 
