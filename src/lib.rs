@@ -5,6 +5,8 @@ pub mod centered_average;
 #[cfg(feature = "fetch")]
 pub mod fetch;
 pub mod parsers;
+#[cfg(feature = "python")]
+pub mod python;
 pub mod store;
 
 use alloc::string::String;

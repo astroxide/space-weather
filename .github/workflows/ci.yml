@@ -10,7 +10,7 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt, clippy
@@ -29,3 +29,21 @@ jobs:
 
       - name: Doc
         run: cargo doc --no-deps
+
+  python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install deps
+        run: pip install maturin numpy pytest
+
+      - name: Build extension
+        run: maturin develop --features python
+
+      - name: Test
+        run: pytest tests/python/ -v
