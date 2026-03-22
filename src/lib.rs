@@ -3,6 +3,7 @@ extern crate alloc;
 
 pub mod centered_average;
 pub mod parsers;
+pub mod store;
 
 use alloc::string::String;
 use alloc::vec::Vec;
