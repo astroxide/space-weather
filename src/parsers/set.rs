@@ -98,16 +98,18 @@ pub fn parse_solfsmy(input: &[u8]) -> Result<Vec<SpaceWeatherRecord>, SpaceWeath
         let doy: u16 = parse_int(sl(b, SOLFSMY_DDD.0, SOLFSMY_DDD.1), row, "doy")?;
         let date = doy_to_date(year, doy, row)?;
 
-        let f10_7 = parse_float(sl(b, SOLFSMY_F107.0, SOLFSMY_F107.1), row, "F10.7")?;
-        let f10_7a = parse_float(sl(b, SOLFSMY_F81C.0, SOLFSMY_F81C.1), row, "F10.7a")?;
+        let f10_7_jb = parse_float(sl(b, SOLFSMY_F107.0, SOLFSMY_F107.1), row, "F10.7")?;
+        let f10_7_jb_81c = parse_float(sl(b, SOLFSMY_F81C.0, SOLFSMY_F81C.1), row, "F81c")?;
         let s10_7 = parse_float(sl(b, SOLFSMY_S107.0, SOLFSMY_S107.1), row, "S10.7")?;
         let m10_7 = parse_float(sl(b, SOLFSMY_M107.0, SOLFSMY_M107.1), row, "M10.7")?;
         let y10_7 = parse_float(sl(b, SOLFSMY_Y107.0, SOLFSMY_Y107.1), row, "Y10.7")?;
 
         records.push(SpaceWeatherRecord {
             date,
-            f10_7: Some(f10_7),
-            f10_7a: Some(f10_7a),
+            f10_7_obs: None,
+            f10_7_adj: None,
+            f10_7_jb: Some(f10_7_jb),
+            f10_7_jb_81c: Some(f10_7_jb_81c),
             s10_7: Some(s10_7),
             m10_7: Some(m10_7),
             y10_7: Some(y10_7),
@@ -165,8 +167,10 @@ pub fn parse_dtcfile(input: &[u8]) -> Result<Vec<SpaceWeatherRecord>, SpaceWeath
         records.push(SpaceWeatherRecord {
             date,
             dtc: Some(sum / DTCFILE_DTC_COUNT as f64),
-            f10_7: None,
-            f10_7a: None,
+            f10_7_obs: None,
+            f10_7_adj: None,
+            f10_7_jb: None,
+            f10_7_jb_81c: None,
             ap_daily: None,
             ap_3hr: None,
             kp_3hr: None,
@@ -215,8 +219,8 @@ DTC 2023  167  24  38  38  38  31  31  31  38  38  38  31  31  31  31  31  31  3
                 day: 15
             }
         );
-        assert_eq!(records[0].f10_7, Some(150.3));
-        assert_eq!(records[0].f10_7a, Some(148.1));
+        assert_eq!(records[0].f10_7_jb, Some(150.3));
+        assert_eq!(records[0].f10_7_jb_81c, Some(148.1));
         assert_eq!(records[0].s10_7, Some(120.5));
         assert_eq!(records[0].m10_7, Some(115.3));
         assert_eq!(records[0].y10_7, Some(118.9));
@@ -230,7 +234,7 @@ DTC 2023  167  24  38  38  38  31  31  31  38  38  38  31  31  31  31  31  31  3
                 day: 16
             }
         );
-        assert_eq!(records[1].f10_7, Some(152.0));
+        assert_eq!(records[1].f10_7_jb, Some(152.0));
     }
 
     #[test]

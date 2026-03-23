@@ -22,7 +22,7 @@ class TestCelestrakLoad:
         rec = sw.get(dr[0])
         assert rec is not None
         assert rec["date"] == dr[0]
-        assert "f10_7" in rec
+        assert "f10_7_obs" in rec
         assert "ap_daily" in rec
         assert "ap_3hr" in rec
         assert "kp_3hr" in rec
@@ -84,8 +84,8 @@ class TestNumpy:
         n = len(sw)
         arrays = sw.to_numpy()
 
-        assert arrays["f10_7"].shape == (n,)
-        assert arrays["f10_7"].dtype == np.float64
+        assert arrays["f10_7_obs"].shape == (n,)
+        assert arrays["f10_7_obs"].dtype == np.float64
         assert arrays["ap_3hr"].shape == (n, 8)
         assert arrays["kp_3hr"].shape == (n, 8)
         assert len(arrays["date"]) == n

@@ -21,8 +21,10 @@ fn py_to_date(obj: &Bound<'_, PyAny>) -> PyResult<Date> {
 fn record_to_dict<'py>(py: Python<'py>, rec: &SpaceWeatherRecord) -> PyResult<Bound<'py, PyDict>> {
     let d = PyDict::new(py);
     d.set_item("date", date_to_py(py, rec.date)?)?;
-    d.set_item("f10_7", rec.f10_7)?;
-    d.set_item("f10_7a", rec.f10_7a)?;
+    d.set_item("f10_7_obs", rec.f10_7_obs)?;
+    d.set_item("f10_7_adj", rec.f10_7_adj)?;
+    d.set_item("f10_7_jb", rec.f10_7_jb)?;
+    d.set_item("f10_7_jb_81c", rec.f10_7_jb_81c)?;
     d.set_item("ap_daily", rec.ap_daily)?;
     d.set_item("ap_3hr", rec.ap_3hr.map(|a| a.to_vec()))?;
     d.set_item("kp_3hr", rec.kp_3hr.map(|a| a.to_vec()))?;
@@ -160,8 +162,10 @@ impl SpaceWeather {
         };
 
         let mut dates: Vec<PyObject> = Vec::with_capacity(n);
-        let mut f10_7 = vec![f64::NAN; n];
-        let mut f10_7a = vec![f64::NAN; n];
+        let mut f10_7_obs = vec![f64::NAN; n];
+        let mut f10_7_adj = vec![f64::NAN; n];
+        let mut f10_7_jb = vec![f64::NAN; n];
+        let mut f10_7_jb_81c = vec![f64::NAN; n];
         let mut ap_daily = vec![f64::NAN; n];
         let mut s10_7 = vec![f64::NAN; n];
         let mut m10_7 = vec![f64::NAN; n];
@@ -172,11 +176,17 @@ impl SpaceWeather {
 
         for (i, rec) in range.iter().enumerate() {
             dates.push(date_to_py(py, rec.date)?);
-            if let Some(v) = rec.f10_7 {
-                f10_7[i] = v;
+            if let Some(v) = rec.f10_7_obs {
+                f10_7_obs[i] = v;
             }
-            if let Some(v) = rec.f10_7a {
-                f10_7a[i] = v;
+            if let Some(v) = rec.f10_7_adj {
+                f10_7_adj[i] = v;
+            }
+            if let Some(v) = rec.f10_7_jb {
+                f10_7_jb[i] = v;
+            }
+            if let Some(v) = rec.f10_7_jb_81c {
+                f10_7_jb_81c[i] = v;
             }
             if let Some(v) = rec.ap_daily {
                 ap_daily[i] = v;
@@ -216,8 +226,10 @@ impl SpaceWeather {
             };
         }
 
-        set_array!("f10_7", f10_7);
-        set_array!("f10_7a", f10_7a);
+        set_array!("f10_7_obs", f10_7_obs);
+        set_array!("f10_7_adj", f10_7_adj);
+        set_array!("f10_7_jb", f10_7_jb);
+        set_array!("f10_7_jb_81c", f10_7_jb_81c);
         set_array!("ap_daily", ap_daily);
         set_array!("s10_7", s10_7);
         set_array!("m10_7", m10_7);

@@ -64,8 +64,10 @@ fn merge_record(target: &mut SpaceWeatherRecord, source: SpaceWeatherRecord) {
             }
         };
     }
-    fill!(f10_7);
-    fill!(f10_7a);
+    fill!(f10_7_obs);
+    fill!(f10_7_adj);
+    fill!(f10_7_jb);
+    fill!(f10_7_jb_81c);
     fill!(ap_daily);
     fill!(ap_3hr);
     fill!(kp_3hr);
@@ -111,8 +113,10 @@ mod tests {
     fn empty_record(d: Date) -> SpaceWeatherRecord {
         SpaceWeatherRecord {
             date: d,
-            f10_7: None,
-            f10_7a: None,
+            f10_7_obs: None,
+            f10_7_adj: None,
+            f10_7_jb: None,
+            f10_7_jb_81c: None,
             ap_daily: None,
             ap_3hr: None,
             kp_3hr: None,
@@ -125,12 +129,12 @@ mod tests {
 
     fn record_with(
         d: Date,
-        f10_7: Option<f64>,
+        f10_7_obs: Option<f64>,
         ap_daily: Option<f64>,
         s10_7: Option<f64>,
     ) -> SpaceWeatherRecord {
         SpaceWeatherRecord {
-            f10_7,
+            f10_7_obs,
             ap_daily,
             s10_7,
             ..empty_record(d)
@@ -159,7 +163,7 @@ mod tests {
             record_with(d, None, Some(10.0), None),
         ]);
         assert_eq!(store.len(), 1);
-        assert_eq!(store.records[0].f10_7, Some(150.0));
+        assert_eq!(store.records[0].f10_7_obs, Some(150.0));
         assert_eq!(store.records[0].ap_daily, Some(10.0));
     }
 
@@ -170,7 +174,7 @@ mod tests {
             record_with(d, Some(150.0), None, None),
             record_with(d, Some(999.0), None, None),
         ]);
-        assert_eq!(store.records[0].f10_7, Some(150.0));
+        assert_eq!(store.records[0].f10_7_obs, Some(150.0));
     }
 
     #[test]
@@ -191,7 +195,7 @@ mod tests {
             empty_record(date(2024, 12, 31)),
         ]);
         let rec = store.get(d).unwrap();
-        assert_eq!(rec.f10_7, Some(140.0));
+        assert_eq!(rec.f10_7_obs, Some(140.0));
     }
 
     #[test]
@@ -241,7 +245,7 @@ mod tests {
         a.merge(b);
         assert_eq!(a.len(), 1);
         let rec = a.get(d).unwrap();
-        assert_eq!(rec.f10_7, Some(150.0));
+        assert_eq!(rec.f10_7_obs, Some(150.0));
         assert_eq!(rec.ap_daily, Some(10.0));
         assert_eq!(rec.s10_7, Some(120.0));
     }
@@ -252,7 +256,7 @@ mod tests {
         let mut a = SpaceWeatherStore::new(vec![record_with(d, Some(150.0), None, None)]);
         let b = SpaceWeatherStore::new(vec![record_with(d, Some(999.0), None, None)]);
         a.merge(b);
-        assert_eq!(a.get(d).unwrap().f10_7, Some(150.0));
+        assert_eq!(a.get(d).unwrap().f10_7_obs, Some(150.0));
     }
 
     #[test]

@@ -71,15 +71,17 @@ fn none_propagation() {
     assert_eq!(result[4], None); // incomplete window
 }
 
-fn make_record(date_day: u8, f10_7: Option<f64>, f10_7a: Option<f64>) -> SpaceWeatherRecord {
+fn make_record(date_day: u8, f10_7_obs: Option<f64>, f10_7_adj: Option<f64>) -> SpaceWeatherRecord {
     SpaceWeatherRecord {
         date: Date {
             year: 2023,
             month: 1,
             day: date_day,
         },
-        f10_7,
-        f10_7a,
+        f10_7_obs,
+        f10_7_adj,
+        f10_7_jb: None,
+        f10_7_jb_81c: None,
         ap_daily: None,
         ap_3hr: None,
         kp_3hr: None,
@@ -96,13 +98,13 @@ fn compute_for_records_populates_f10_7a() {
         .map(|d| make_record(d, Some(d as f64 * 10.0), None))
         .collect();
 
-    compute_for_records(&mut records, 3, |r| r.f10_7, |r, v| r.f10_7a = v).unwrap();
+    compute_for_records(&mut records, 3, |r| r.f10_7_obs, |r, v| r.f10_7_adj = v).unwrap();
 
-    assert_eq!(records[0].f10_7a, None);
-    assert_eq!(records[1].f10_7a, Some(20.0));
-    assert_eq!(records[2].f10_7a, Some(30.0));
-    assert_eq!(records[3].f10_7a, Some(40.0));
-    assert_eq!(records[4].f10_7a, None);
+    assert_eq!(records[0].f10_7_adj, None);
+    assert_eq!(records[1].f10_7_adj, Some(20.0));
+    assert_eq!(records[2].f10_7_adj, Some(30.0));
+    assert_eq!(records[3].f10_7_adj, Some(40.0));
+    assert_eq!(records[4].f10_7_adj, None);
 }
 
 #[test]
@@ -111,19 +113,19 @@ fn compute_for_records_overwrites_existing() {
         .map(|d| make_record(d, Some(d as f64), Some(999.0)))
         .collect();
 
-    compute_for_records(&mut records, 3, |r| r.f10_7, |r, v| r.f10_7a = v).unwrap();
+    compute_for_records(&mut records, 3, |r| r.f10_7_obs, |r, v| r.f10_7_adj = v).unwrap();
 
     // Edges overwritten to None, middle overwritten to computed value
-    assert_eq!(records[0].f10_7a, None);
-    assert_eq!(records[2].f10_7a, Some(3.0));
-    assert_eq!(records[4].f10_7a, None);
+    assert_eq!(records[0].f10_7_adj, None);
+    assert_eq!(records[2].f10_7_adj, Some(3.0));
+    assert_eq!(records[4].f10_7_adj, None);
 }
 
 #[test]
 fn validate_against_celestrak_precomputed() {
     let csv = include_bytes!("fixtures/SW-Last5Years.csv");
 
-    // Parse records to get daily f10_7 values
+    // Parse records to get daily f10_7_obs values
     let mut records = celestrak::parse(csv).unwrap();
 
     // Extract pre-computed F10.7_OBS_CENTER81 directly from CSV
@@ -146,12 +148,12 @@ fn validate_against_celestrak_precomputed() {
         })
         .collect();
 
-    // Compute centered averages from daily f10_7
+    // Compute centered averages from daily f10_7_obs
     compute_for_records(
         &mut records,
         DEFAULT_WINDOW,
-        |r| r.f10_7,
-        |r, v| r.f10_7a = v,
+        |r| r.f10_7_obs,
+        |r, v| r.f10_7_adj = v,
     )
     .unwrap();
 
@@ -169,7 +171,7 @@ fn validate_against_celestrak_precomputed() {
         if rec.date >= cutoff {
             break;
         }
-        if let (Some(computed), Some(expected)) = (rec.f10_7a, precomputed[i]) {
+        if let (Some(computed), Some(expected)) = (rec.f10_7_adj, precomputed[i]) {
             let diff = (computed - expected).abs();
             if diff > max_diff {
                 max_diff = diff;

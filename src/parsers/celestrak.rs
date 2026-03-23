@@ -92,8 +92,8 @@ fn resolve_array_cols(
 
 struct ColumnLayout {
     date: usize,
-    f10_7: usize,
-    f10_7a: usize,
+    f10_7_obs: usize,
+    f10_7_adj: usize,
     ap_daily: usize,
     ap_3hr: [usize; 8],
     kp_3hr: [usize; 8],
@@ -102,8 +102,8 @@ struct ColumnLayout {
 fn resolve_columns(cols: &BTreeMap<String, usize>) -> Result<ColumnLayout, SpaceWeatherError> {
     Ok(ColumnLayout {
         date: require_col(cols, "DATE")?,
-        f10_7: resolve_col(cols, &["F10.7_OBS", "F10.7"])?,
-        f10_7a: resolve_col(cols, &["F10.7_ADJ", "F10.7A"])?,
+        f10_7_obs: resolve_col(cols, &["F10.7_OBS", "F10.7"])?,
+        f10_7_adj: resolve_col(cols, &["F10.7_ADJ", "F10.7A"])?,
         ap_daily: resolve_col(cols, &["AP_AVG", "AP"])?,
         ap_3hr: resolve_array_cols(cols, "AP", 8)?,
         kp_3hr: resolve_array_cols(cols, "KP", 8)?,
@@ -123,8 +123,10 @@ fn parse_row(
 
     Ok(SpaceWeatherRecord {
         date,
-        f10_7: parse_f64_opt(fields.get(layout.f10_7).copied().unwrap_or("")),
-        f10_7a: parse_f64_opt(fields.get(layout.f10_7a).copied().unwrap_or("")),
+        f10_7_obs: parse_f64_opt(fields.get(layout.f10_7_obs).copied().unwrap_or("")),
+        f10_7_adj: parse_f64_opt(fields.get(layout.f10_7_adj).copied().unwrap_or("")),
+        f10_7_jb: None,
+        f10_7_jb_81c: None,
         ap_daily: parse_f64_opt(fields.get(layout.ap_daily).copied().unwrap_or("")),
         ap_3hr: parse_array_8(fields, &layout.ap_3hr),
         kp_3hr: parse_array_8(fields, &layout.kp_3hr),
@@ -193,8 +195,8 @@ mod tests {
                 day: 15
             }
         );
-        assert_eq!(records[0].f10_7, Some(150.3));
-        assert_eq!(records[0].f10_7a, Some(148.1));
+        assert_eq!(records[0].f10_7_obs, Some(150.3));
+        assert_eq!(records[0].f10_7_adj, Some(148.1));
         assert_eq!(records[0].ap_daily, Some(14.0));
         assert_eq!(
             records[0].ap_3hr,
@@ -220,8 +222,8 @@ mod tests {
         let row = sample_row("2023-06-15", "99999", "148.1", "14");
         let csv = make_csv(&[&row]);
         let records = parse(csv.as_bytes()).unwrap();
-        assert_eq!(records[0].f10_7, None);
-        assert_eq!(records[0].f10_7a, Some(148.1));
+        assert_eq!(records[0].f10_7_obs, None);
+        assert_eq!(records[0].f10_7_adj, Some(148.1));
     }
 
     #[test]
@@ -229,7 +231,7 @@ mod tests {
         let row = sample_row("2023-06-15", "", "148.1", "14");
         let csv = make_csv(&[&row]);
         let records = parse(csv.as_bytes()).unwrap();
-        assert_eq!(records[0].f10_7, None);
+        assert_eq!(records[0].f10_7_obs, None);
     }
 
     #[test]
@@ -237,7 +239,7 @@ mod tests {
         let row = sample_row("2023-06-15", "999.9", "148.1", "14");
         let csv = make_csv(&[&row]);
         let records = parse(csv.as_bytes()).unwrap();
-        assert_eq!(records[0].f10_7, None);
+        assert_eq!(records[0].f10_7_obs, None);
     }
 
     #[test]

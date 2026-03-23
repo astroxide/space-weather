@@ -23,8 +23,8 @@ fn parse_solfsmy_all() {
             day: 1
         }
     );
-    assert_eq!(first.f10_7, Some(72.4));
-    assert_eq!(first.f10_7a, Some(78.0));
+    assert_eq!(first.f10_7_jb, Some(72.4));
+    assert_eq!(first.f10_7_jb_81c, Some(78.0));
     assert_eq!(first.s10_7, Some(74.0));
     assert_eq!(first.m10_7, Some(65.4));
     assert_eq!(first.y10_7, Some(61.9));
