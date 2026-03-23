@@ -32,8 +32,10 @@ impl Date {
 #[derive(Clone, Debug)]
 pub struct SpaceWeatherRecord {
     pub date: Date,
-    pub f10_7: Option<f64>,
-    pub f10_7a: Option<f64>,
+    pub f10_7_obs: Option<f64>,
+    pub f10_7_adj: Option<f64>,
+    pub f10_7_jb: Option<f64>,
+    pub f10_7_jb_81c: Option<f64>,
     pub ap_daily: Option<f64>,
     pub ap_3hr: Option<[f64; 8]>,
     pub kp_3hr: Option<[f64; 8]>,
@@ -47,8 +49,10 @@ impl SpaceWeatherRecord {
     pub fn validate(&self) -> Result<(), SpaceWeatherError> {
         self.date.validate()?;
         for v in [
-            self.f10_7,
-            self.f10_7a,
+            self.f10_7_obs,
+            self.f10_7_adj,
+            self.f10_7_jb,
+            self.f10_7_jb_81c,
             self.ap_daily,
             self.s10_7,
             self.m10_7,

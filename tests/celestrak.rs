@@ -23,7 +23,7 @@ fn parse_sw_all() {
             day: 1
         }
     );
-    assert_eq!(first.f10_7, Some(269.3));
+    assert_eq!(first.f10_7_obs, Some(269.3));
     assert_eq!(first.ap_daily, Some(21.0));
     assert!(first.ap_3hr.is_some());
     assert!(first.kp_3hr.is_some());
@@ -47,8 +47,8 @@ fn parse_sw_last5years() {
             day: 1
         }
     );
-    assert_eq!(first.f10_7, Some(80.4));
-    assert_eq!(first.f10_7a, Some(77.7));
+    assert_eq!(first.f10_7_obs, Some(80.4));
+    assert_eq!(first.f10_7_adj, Some(77.7));
 }
 
 #[test]
@@ -61,7 +61,10 @@ fn predicted_monthly_rows_have_empty_kp_ap() {
         assert_eq!(r.kp_3hr, None);
         assert_eq!(r.ap_3hr, None);
         assert_eq!(r.ap_daily, None);
-        assert!(r.f10_7.is_some(), "predicted row should still have F10.7");
+        assert!(
+            r.f10_7_obs.is_some(),
+            "predicted row should still have F10.7"
+        );
     }
 }
 

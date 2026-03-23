@@ -37,8 +37,10 @@ fn celestrak_only_record() {
             month: 10,
             day: 15,
         },
-        f10_7: Some(150.0),
-        f10_7a: Some(145.0),
+        f10_7_obs: Some(150.0),
+        f10_7_adj: Some(145.0),
+        f10_7_jb: None,
+        f10_7_jb_81c: None,
         ap_daily: Some(12.0),
         ap_3hr: Some([5.0, 7.0, 9.0, 12.0, 15.0, 9.0, 6.0, 4.0]),
         kp_3hr: Some([1.7, 2.0, 2.3, 3.0, 3.3, 2.3, 1.7, 1.3]),
@@ -59,8 +61,10 @@ fn set_only_record() {
             month: 10,
             day: 15,
         },
-        f10_7: None,
-        f10_7a: None,
+        f10_7_obs: None,
+        f10_7_adj: None,
+        f10_7_jb: None,
+        f10_7_jb_81c: None,
         ap_daily: None,
         ap_3hr: None,
         kp_3hr: None,
@@ -81,8 +85,10 @@ fn merged_record() {
             month: 10,
             day: 15,
         },
-        f10_7: Some(150.0),
-        f10_7a: Some(145.0),
+        f10_7_obs: Some(150.0),
+        f10_7_adj: Some(145.0),
+        f10_7_jb: None,
+        f10_7_jb_81c: None,
         ap_daily: Some(12.0),
         ap_3hr: None,
         kp_3hr: None,
@@ -92,7 +98,7 @@ fn merged_record() {
         dtc: Some(10.5),
     };
     assert!(rec.validate().is_ok());
-    assert!(rec.f10_7.is_some());
+    assert!(rec.f10_7_obs.is_some());
     assert!(rec.s10_7.is_some());
 }
 
@@ -121,8 +127,10 @@ fn negative_index_rejected() {
             month: 1,
             day: 1,
         },
-        f10_7: Some(-50.0),
-        f10_7a: None,
+        f10_7_obs: Some(-50.0),
+        f10_7_adj: None,
+        f10_7_jb: None,
+        f10_7_jb_81c: None,
         ap_daily: None,
         ap_3hr: None,
         kp_3hr: None,
