@@ -1,3 +1,8 @@
+//! Python bindings via PyO3.
+//!
+//! Exposes [`SpaceWeather`] as a Python class with file loading, URL fetching,
+//! date queries, and NumPy export.
+
 use pyo3::prelude::*;
 use pyo3::types::{PyDict, PyList};
 

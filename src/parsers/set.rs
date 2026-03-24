@@ -1,3 +1,8 @@
+//! Parsers for SET (Space Environment Technologies) fixed-width files.
+//!
+//! Supports SOLFSMY.TXT (solar indices for JB2008) and DTCFILE.TXT
+//! (temperature correction coefficients).
+
 use alloc::string::String;
 use alloc::vec::Vec;
 use core::str;
@@ -74,6 +79,18 @@ const SOLFSMY_S107: (usize, usize) = (34, 40);
 const SOLFSMY_M107: (usize, usize) = (46, 52);
 const SOLFSMY_Y107: (usize, usize) = (58, 64);
 
+/// Parses a SET SOLFSMY.TXT file into records.
+///
+/// Extracts F10.7 (JB2008), S10.7, M10.7, Y10.7 and their 81-day averages.
+///
+/// ```
+/// use space_weather::parsers::set;
+///
+/// let input = b"  2023 166   2460111.5 150.3 148.1 120.5 118.2 115.3 113.1 118.9 116.5  0000\n";
+/// let records = set::parse_solfsmy(input).unwrap();
+/// assert_eq!(records.len(), 1);
+/// assert_eq!(records[0].s10_7, Some(120.5));
+/// ```
 pub fn parse_solfsmy(input: &[u8]) -> Result<Vec<SpaceWeatherRecord>, SpaceWeatherError> {
     let text = str::from_utf8(input).map_err(|_| SpaceWeatherError::ParseError {
         row: 0,
@@ -132,6 +149,17 @@ const DTCFILE_DTC_START: usize = 13;
 const DTCFILE_DTC_WIDTH: usize = 4;
 const DTCFILE_DTC_COUNT: usize = 24;
 
+/// Parses a SET DTCFILE.TXT file into records.
+///
+/// Extracts the daily mean Dtc (temperature correction) from 24 hourly values.
+///
+/// ```
+/// use space_weather::parsers::set;
+///
+/// let input = b"DTC 2023  166  10  10  10  10  10  10  10  10  10  10  10  10  10  10  10  10  10  10  10  10  10  10  10  10\n";
+/// let records = set::parse_dtcfile(input).unwrap();
+/// assert_eq!(records[0].dtc, Some(10.0));
+/// ```
 pub fn parse_dtcfile(input: &[u8]) -> Result<Vec<SpaceWeatherRecord>, SpaceWeatherError> {
     let text = str::from_utf8(input).map_err(|_| SpaceWeatherError::ParseError {
         row: 0,
