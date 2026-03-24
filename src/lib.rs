@@ -1,3 +1,9 @@
+//! Space weather indices and parsers for aerospace applications.
+//!
+//! Provides types, parsers, and a query store for space weather data from
+//! CelesTrak and SET (Space Environment Technologies). Supports `no_std`
+//! (with `alloc`). Optional features enable HTTP fetching and Python bindings.
+
 #![cfg_attr(not(feature = "std"), no_std)]
 extern crate alloc;
 
@@ -13,6 +19,7 @@ use alloc::string::String;
 use alloc::vec::Vec;
 use core::fmt;
 
+/// Calendar date (year, month, day) used as the primary key for space weather records.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Date {
     pub year: i32,
@@ -29,6 +36,10 @@ impl Date {
     }
 }
 
+/// A single day's space weather indices from one or more data sources.
+///
+/// Fields are `Option` because not every source provides every index.
+/// Use [`store::SpaceWeatherStore::merge`] to combine records from different sources.
 #[derive(Clone, Debug)]
 pub struct SpaceWeatherRecord {
     pub date: Date,
@@ -70,11 +81,16 @@ impl SpaceWeatherRecord {
     }
 }
 
+/// Trait for querying space weather data by date.
 pub trait SpaceWeatherIndex {
+    /// Returns the record for an exact date, or `None` if not present.
     fn get(&self, date: Date) -> Option<&SpaceWeatherRecord>;
+
+    /// Returns all records in the inclusive date range `[start, end]`.
     fn get_range(&self, start: Date, end: Date) -> Vec<&SpaceWeatherRecord>;
 }
 
+/// Errors returned by parsing, validation, and store operations.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum SpaceWeatherError {
     InvalidDate,

@@ -1,3 +1,5 @@
+//! Parser for CelesTrak space weather CSV files (SW-Last5Years.csv, SW-All.csv).
+
 use alloc::collections::BTreeMap;
 use alloc::string::String;
 use alloc::vec::Vec;
@@ -137,6 +139,24 @@ fn parse_row(
     })
 }
 
+/// Parses a CelesTrak space weather CSV file into records.
+///
+/// Accepts the raw bytes of SW-Last5Years.csv or SW-All.csv.
+///
+/// ```
+/// use space_weather::parsers::celestrak;
+///
+/// let csv = b"DATE,BSRN,ND,KP1,KP2,KP3,KP4,KP5,KP6,KP7,KP8,KP_SUM,\
+///     AP1,AP2,AP3,AP4,AP5,AP6,AP7,AP8,AP_AVG,CP,C9,ISN,\
+///     F10.7_OBS,F10.7_ADJ,F10.7_DATA_TYPE,\
+///     F10.7_OBS_CENTER81,F10.7_OBS_LAST81,F10.7_ADJ_CENTER81,F10.7_ADJ_LAST81\n\
+///     2023-06-15,2514,25,2.0,3.3,1.7,2.3,4.0,5.0,2.7,1.0,22.0,\
+///     7,12,5,9,27,39,12,4,14,0.8,3,135,\
+///     150.3,148.1,0,150.2,148.9,147.1,146.0";
+/// let records = celestrak::parse(csv).unwrap();
+/// assert_eq!(records.len(), 1);
+/// assert_eq!(records[0].f10_7_obs, Some(150.3));
+/// ```
 pub fn parse(input: &[u8]) -> Result<Vec<SpaceWeatherRecord>, SpaceWeatherError> {
     let text = str::from_utf8(input).map_err(|_| SpaceWeatherError::InvalidHeader)?;
     let mut lines = text.lines();

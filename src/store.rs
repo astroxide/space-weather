@@ -1,18 +1,53 @@
+//! In-memory store for space weather records with date-based lookup.
+
 use alloc::vec::Vec;
 
 use crate::{Date, SpaceWeatherIndex, SpaceWeatherRecord};
 
+/// Sorted, deduplicated collection of [`SpaceWeatherRecord`]s with O(log n) date lookup.
+///
+/// ```
+/// use space_weather::{Date, SpaceWeatherRecord, SpaceWeatherIndex};
+/// use space_weather::store::SpaceWeatherStore;
+///
+/// let records = vec![SpaceWeatherRecord {
+///     date: Date { year: 2023, month: 6, day: 15 },
+///     f10_7_obs: Some(150.3),
+///     ..SpaceWeatherRecord {
+///         date: Date { year: 2023, month: 6, day: 15 },
+///         f10_7_obs: None, f10_7_adj: None, f10_7_jb: None,
+///         f10_7_jb_81c: None, ap_daily: None, ap_3hr: None,
+///         kp_3hr: None, s10_7: None, m10_7: None, y10_7: None, dtc: None,
+///     }
+/// }];
+/// let store = SpaceWeatherStore::new(records);
+/// assert_eq!(store.len(), 1);
+/// ```
 pub struct SpaceWeatherStore {
     records: Vec<SpaceWeatherRecord>,
 }
 
 impl SpaceWeatherStore {
+    /// Creates a new store from a vec of records, sorting by date and merging duplicates.
     pub fn new(mut records: Vec<SpaceWeatherRecord>) -> Self {
         records.sort_by_key(|r| r.date);
         let records = dedup_merge(records);
         Self { records }
     }
 
+    /// Merges another store into this one. For overlapping dates, fields already
+    /// present in `self` take precedence; `None` fields are filled from `other`.
+    ///
+    /// ```
+    /// use space_weather::parsers::{celestrak, set};
+    /// use space_weather::store::SpaceWeatherStore;
+    ///
+    /// # let csv = b"DATE,BSRN,ND,KP1,KP2,KP3,KP4,KP5,KP6,KP7,KP8,KP_SUM,AP1,AP2,AP3,AP4,AP5,AP6,AP7,AP8,AP_AVG,CP,C9,ISN,F10.7_OBS,F10.7_ADJ,F10.7_DATA_TYPE,F10.7_OBS_CENTER81,F10.7_OBS_LAST81,F10.7_ADJ_CENTER81,F10.7_ADJ_LAST81\n";
+    /// # let solfsmy = b"";
+    /// let mut store = SpaceWeatherStore::new(celestrak::parse(csv).unwrap());
+    /// let set_store = SpaceWeatherStore::new(set::parse_solfsmy(solfsmy).unwrap());
+    /// store.merge(set_store);
+    /// ```
     pub fn merge(&mut self, other: SpaceWeatherStore) {
         let mut combined = Vec::with_capacity(self.records.len() + other.records.len());
         combined.append(&mut self.records);
@@ -21,24 +56,43 @@ impl SpaceWeatherStore {
         self.records = dedup_merge(combined);
     }
 
+    /// Returns the number of records.
     pub fn len(&self) -> usize {
         self.records.len()
     }
 
+    /// Returns `true` if the store contains no records.
     pub fn is_empty(&self) -> bool {
         self.records.is_empty()
     }
 
+    /// Returns the earliest date in the store, or `None` if empty.
     pub fn first_date(&self) -> Option<Date> {
         self.records.first().map(|r| r.date)
     }
 
+    /// Returns the latest date in the store, or `None` if empty.
     pub fn last_date(&self) -> Option<Date> {
         self.records.last().map(|r| r.date)
     }
 }
 
 impl SpaceWeatherIndex for SpaceWeatherStore {
+    /// ```
+    /// use space_weather::{Date, SpaceWeatherRecord, SpaceWeatherIndex};
+    /// use space_weather::store::SpaceWeatherStore;
+    ///
+    /// let d = Date { year: 2023, month: 6, day: 15 };
+    /// let rec = SpaceWeatherRecord {
+    ///     date: d, f10_7_obs: Some(150.3), f10_7_adj: None,
+    ///     f10_7_jb: None, f10_7_jb_81c: None, ap_daily: None,
+    ///     ap_3hr: None, kp_3hr: None, s10_7: None, m10_7: None,
+    ///     y10_7: None, dtc: None,
+    /// };
+    /// let store = SpaceWeatherStore::new(vec![rec]);
+    /// assert!(store.get(d).is_some());
+    /// assert!(store.get(Date { year: 2024, month: 1, day: 1 }).is_none());
+    /// ```
     fn get(&self, date: Date) -> Option<&SpaceWeatherRecord> {
         self.records
             .binary_search_by_key(&date, |r| r.date)
@@ -46,6 +100,23 @@ impl SpaceWeatherIndex for SpaceWeatherStore {
             .map(|i| &self.records[i])
     }
 
+    /// ```
+    /// use space_weather::{Date, SpaceWeatherRecord, SpaceWeatherIndex};
+    /// use space_weather::store::SpaceWeatherStore;
+    ///
+    /// let mk = |d: u8| SpaceWeatherRecord {
+    ///     date: Date { year: 2023, month: 1, day: d },
+    ///     f10_7_obs: None, f10_7_adj: None, f10_7_jb: None,
+    ///     f10_7_jb_81c: None, ap_daily: None, ap_3hr: None,
+    ///     kp_3hr: None, s10_7: None, m10_7: None, y10_7: None, dtc: None,
+    /// };
+    /// let store = SpaceWeatherStore::new(vec![mk(1), mk(2), mk(3), mk(4), mk(5)]);
+    /// let range = store.get_range(
+    ///     Date { year: 2023, month: 1, day: 2 },
+    ///     Date { year: 2023, month: 1, day: 4 },
+    /// );
+    /// assert_eq!(range.len(), 3);
+    /// ```
     fn get_range(&self, start: Date, end: Date) -> Vec<&SpaceWeatherRecord> {
         if start > end {
             return Vec::new();

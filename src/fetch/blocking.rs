@@ -1,3 +1,5 @@
+//! Blocking (synchronous) fetch implementations.
+
 use super::{
     extract_cache_headers, CacheHeaders, FetchError, FetchResult, CELESTRAK_SW_ALL_URL,
     CELESTRAK_SW_LAST5YEARS_URL, SET_DTCFILE_URL, SET_SOLFSMY_URL,
@@ -5,6 +7,7 @@ use super::{
 use reqwest::blocking::Client;
 use reqwest::{header, StatusCode};
 
+/// Fetches raw bytes from `url`, optionally using cached ETag/Last-Modified headers.
 pub fn fetch_url(url: &str, cache: Option<&CacheHeaders>) -> Result<FetchResult, FetchError> {
     let client = Client::new();
     let mut req = client.get(url);
@@ -38,18 +41,22 @@ pub fn fetch_url(url: &str, cache: Option<&CacheHeaders>) -> Result<FetchResult,
     })
 }
 
+/// Fetches the CelesTrak last-5-years space weather CSV.
 pub fn fetch_celestrak_5yr(cache: Option<&CacheHeaders>) -> Result<FetchResult, FetchError> {
     fetch_url(CELESTRAK_SW_LAST5YEARS_URL, cache)
 }
 
+/// Fetches the CelesTrak full-history space weather CSV.
 pub fn fetch_celestrak_all(cache: Option<&CacheHeaders>) -> Result<FetchResult, FetchError> {
     fetch_url(CELESTRAK_SW_ALL_URL, cache)
 }
 
+/// Fetches the SET SOLFSMY.TXT file.
 pub fn fetch_solfsmy(cache: Option<&CacheHeaders>) -> Result<FetchResult, FetchError> {
     fetch_url(SET_SOLFSMY_URL, cache)
 }
 
+/// Fetches the SET DTCFILE.TXT file.
 pub fn fetch_dtcfile(cache: Option<&CacheHeaders>) -> Result<FetchResult, FetchError> {
     fetch_url(SET_DTCFILE_URL, cache)
 }

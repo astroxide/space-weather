@@ -17,3 +17,11 @@ python = ["std", "dep:pyo3", "dep:numpy"]
 reqwest = { version = "0.12", default-features = false, features = ["rustls-tls"], optional = true }
 pyo3 = { version = "0.24", features = ["extension-module"], optional = true }
 numpy = { version = "0.24", optional = true }
+
+[[example]]
+name = "parse_celestrak"
+required-features = ["std"]
+
+[[example]]
+name = "fetch_and_query"
+required-features = ["fetch-blocking"]

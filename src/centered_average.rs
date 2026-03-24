@@ -1,10 +1,18 @@
+//! Centered running mean computation for time-series smoothing.
+
 use alloc::vec;
 use alloc::vec::Vec;
 
 use crate::{SpaceWeatherError, SpaceWeatherRecord};
 
+/// Default window size for centered running mean (81 days).
 pub const DEFAULT_WINDOW: usize = 81;
 
+/// Computes a centered running mean over `values` with the given `window` size.
+///
+/// `window` must be a positive odd number. Returns `None` for positions near
+/// the edges where the full window is unavailable, and for windows containing
+/// any `None` values.
 pub fn centered_mean(
     values: &[Option<f64>],
     window: usize,
@@ -47,6 +55,9 @@ pub fn centered_mean(
     Ok(result)
 }
 
+/// Computes centered running means over a slice of records in place.
+///
+/// Uses `get` to extract the daily value and `set` to write back the averaged value.
 pub fn compute_for_records<G, S>(
     records: &mut [SpaceWeatherRecord],
     window: usize,
