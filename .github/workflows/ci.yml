@@ -30,6 +30,15 @@ jobs:
       - name: Doc
         run: cargo doc --no-deps
 
+      - name: Doc tests
+        run: cargo test --doc
+
+      - name: Test fetch-blocking
+        run: cargo test --features fetch-blocking
+
+      - name: Publish dry-run
+        run: cargo publish --dry-run
+
   python:
     runs-on: ubuntu-latest
     steps:

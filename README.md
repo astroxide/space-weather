@@ -1,5 +1,9 @@
 # space-weather
 
+[![crates.io](https://img.shields.io/crates/v/space-weather.svg)](https://crates.io/crates/space-weather)
+[![docs.rs](https://docs.rs/space-weather/badge.svg)](https://docs.rs/space-weather)
+[![CI](https://github.com/astroxide/space-weather/actions/workflows/ci.yml/badge.svg)](https://github.com/astroxide/space-weather/actions/workflows/ci.yml)
+
 Space weather indices and parsers for aerospace applications. `no_std` compatible (with `alloc`).
 
 Parses space weather data from [CelesTrak](https://celestrak.org) and
