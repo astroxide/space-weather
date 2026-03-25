@@ -2,6 +2,12 @@
 name = "space-weather"
 version = "0.1.0"
 edition = "2021"
+license = "MIT OR Apache-2.0"
+description = "Space weather indices and parsers for aerospace applications (no_std)"
+repository = "https://github.com/astroxide/space-weather"
+categories = ["science", "aerospace", "parser-implementations"]
+keywords = ["space-weather", "f10.7", "ap-index", "celestrak", "jb2008"]
+readme = "README.md"
 
 [lib]
 crate-type = ["lib"]
