@@ -21,7 +21,7 @@ python = ["std", "dep:pyo3", "dep:numpy"]
 
 [dependencies]
 reqwest = { version = "0.12", default-features = false, features = ["rustls-tls"], optional = true }
-pyo3 = { version = "0.24", features = ["extension-module"], optional = true }
+pyo3 = { version = "0.24", features = ["extension-module", "generate-import-lib"], optional = true }
 numpy = { version = "0.24", optional = true }
 
 [[example]]
