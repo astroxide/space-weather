@@ -3,10 +3,28 @@ requires = ["maturin>=1.0,<2.0"]
 build-backend = "maturin"
 
 [project]
-name = "space-weather"
+name = "astroxide-space-weather"
 version = "0.1.0"
+description = "Space weather indices and parsers for aerospace applications"
+license = "MIT OR Apache-2.0"
+authors = [{ name = "Dimitri Kurashvili" }]
 requires-python = ">=3.9"
 dependencies = ["numpy>=1.21"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Rust",
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering :: Astronomy",
+    "Topic :: Scientific/Engineering :: Physics",
+]
+
+[project.urls]
+Repository = "https://github.com/astroxide/space-weather"
+Documentation = "https://docs.rs/space-weather"
+Issues = "https://github.com/astroxide/space-weather/issues"
 
 [tool.maturin]
 features = ["python"]

@@ -1,6 +1,7 @@
 # space-weather
 
 [![crates.io](https://img.shields.io/crates/v/space-weather.svg)](https://crates.io/crates/space-weather)
+[![PyPI](https://img.shields.io/pypi/v/astroxide-space-weather.svg)](https://pypi.org/project/astroxide-space-weather/)
 [![docs.rs](https://docs.rs/space-weather/badge.svg)](https://docs.rs/space-weather)
 [![CI](https://github.com/astroxide/space-weather/actions/workflows/ci.yml/badge.svg)](https://github.com/astroxide/space-weather/actions/workflows/ci.yml)
 
